@@ -1,6 +1,14 @@
 use std::fs;
 use gtk::prelude::*;
-use gtk::{Application, Builder, Window, FileChooserButton};
+use gtk::{
+    Application,
+    Builder,
+    Window,
+    FileChooserButton,
+    ToggleButton,
+    SearchBar,
+    SearchEntry,
+};
 use gdk::RGBA;
 use sourceview::prelude::*;
 use sourceview::{
@@ -9,6 +17,8 @@ use sourceview::{
     LanguageManager,
     StyleSchemeManager,
     Buffer,
+    SearchContext,
+    SearchSettings,
 };
 
 pub struct MainWindow {
@@ -89,5 +99,58 @@ impl MainWindow {
                 source_buffer.remove_source_marks(&iter, &iter, Some("breakpoint"));
             }
         });
+
+        let search_toggle: ToggleButton = self.ui.get_object("search_toggle").unwrap();
+        let search_bar: SearchBar = self.ui.get_object("search_bar").unwrap();
+        let search_toggle_c = search_toggle.clone();
+        let search_bar_c = search_bar.clone();
+        search_toggle.connect_toggled(move |search_toggle| {
+            search_bar_c.set_search_mode(search_toggle.get_active());
+        });
+        search_bar.connect_property_search_mode_enabled_notify(move |search_bar| {
+            search_toggle_c.set_active(search_bar.get_search_mode());
+        });
+
+        let search_entry: SearchEntry = self.ui.get_object("search_entry").unwrap();
+        let ui = self.ui.clone();
+        search_entry.connect_search_changed(move |search_entry| {
+            let search = match search_entry.get_text() {
+                Some(s) => s,
+                None => return,
+            };
+            let settings = SearchSettings::new();
+            settings.set_search_text(Some(&search));
+
+            let buffer: Buffer = ui.get_object("source_buffer").unwrap();
+            let cursor = buffer.get_insert().unwrap();
+            let cursor = buffer.get_iter_at_mark(&cursor);
+
+            let context = SearchContext::new(&buffer, Some(&settings));
+            if let Some((lhs, rhs, _)) = context.forward2(&cursor) {
+                buffer.select_range(&lhs, &rhs);
+            };
+        });
+
+        let ui = self.ui.clone();
+        search_entry.connect_next_match(move |search_entry| {
+            let search = match search_entry.get_text() {
+                Some(s) => s,
+                None => return,
+            };
+            let settings = SearchSettings::new();
+            settings.set_search_text(Some(&search));
+
+            let buffer: Buffer = ui.get_object("source_buffer").unwrap();
+            let cursor = buffer.get_selection_bound().unwrap();
+            let cursor = buffer.get_iter_at_mark(&cursor);
+
+            let context = SearchContext::new(&buffer, Some(&settings));
+            if let Some((lhs, rhs, _)) = context.forward2(&cursor) {
+                buffer.select_range(&lhs, &rhs);
+            };
+        });
+
+        search_entry.connect_previous_match(|_| {});
+        search_entry.connect_stop_search(|_| {});
     }
 }
