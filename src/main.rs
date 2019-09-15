@@ -8,7 +8,7 @@ use gui::MainWindow;
 
 fn main() {
     let application = Application::new(
-        Some("bojanstipic.rdb"),
+        Some("bojanstipic.mend"),
         Default::default(),
     ).unwrap();
 
