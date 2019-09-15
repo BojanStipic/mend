@@ -4,6 +4,8 @@ use gtk::{
     Application,
     Builder,
     Window,
+    AboutDialog,
+    Button,
     FileChooserButton,
     ToggleButton,
     SearchBar,
@@ -66,6 +68,18 @@ impl MainWindow {
     }
 
     fn connect_events(&self) {
+        let open_about_dialog: Button = self.ui.get_object("open_about_dialog").unwrap();
+        let ui = self.ui.clone();
+        open_about_dialog.connect_clicked(move |_| {
+            let about_src = include_str!("AboutDialog.glade");
+            let about_ui = Builder::new_from_string(about_src);
+            let about_dialog: AboutDialog = about_ui.get_object("about_dialog").unwrap();
+            let window: Window = ui.get_object("main_window").unwrap();
+            about_dialog.set_transient_for(Some(&window));
+            about_dialog.run();
+            about_dialog.destroy();
+        });
+
         let file_chooser: FileChooserButton = self.ui.get_object("open_button").unwrap();
         let ui = self.ui.clone();
         file_chooser.connect_file_set(move |file_chooser| {
