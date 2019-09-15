@@ -191,6 +191,7 @@
                             <property name="buffer">source_buffer</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="editable">False</property>
                             <property name="left_margin">2</property>
                             <property name="right_margin">2</property>
                             <property name="monospace">True</property>
