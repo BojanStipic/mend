@@ -1,10 +1,10 @@
 use std::fs;
+use std::ops::Drop;
 use gtk::prelude::*;
 use gtk::{
     Application,
     Builder,
     Window,
-    AboutDialog,
     Button,
     FileChooserButton,
     ToggleButton,
@@ -25,6 +25,30 @@ use sourceview::{
 
 pub struct MainWindow {
     ui: Builder,
+}
+
+pub struct AboutDialog {
+    dialog: gtk::AboutDialog,
+}
+
+impl AboutDialog {
+    fn new(parent: &gtk::Window) -> Self {
+        let glade_src = include_str!("AboutDialog.glade");
+        let builder = Builder::new_from_string(glade_src);
+
+        let dialog: gtk::AboutDialog = builder.get_object("about_dialog").unwrap();
+        dialog.set_transient_for(Some(parent));
+        dialog.run();
+        Self {
+            dialog
+        }
+    }
+}
+
+impl Drop for AboutDialog {
+    fn drop(&mut self) {
+        self.dialog.destroy();
+    }
 }
 
 impl MainWindow {
@@ -71,13 +95,8 @@ impl MainWindow {
         let open_about_dialog: Button = self.ui.get_object("open_about_dialog").unwrap();
         let ui = self.ui.clone();
         open_about_dialog.connect_clicked(move |_| {
-            let about_src = include_str!("AboutDialog.glade");
-            let about_ui = Builder::new_from_string(about_src);
-            let about_dialog: AboutDialog = about_ui.get_object("about_dialog").unwrap();
             let window: Window = ui.get_object("main_window").unwrap();
-            about_dialog.set_transient_for(Some(&window));
-            about_dialog.run();
-            about_dialog.destroy();
+            AboutDialog::new(&window);
         });
 
         let file_chooser: FileChooserButton = self.ui.get_object("open_button").unwrap();
