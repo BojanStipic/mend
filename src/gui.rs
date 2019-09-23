@@ -15,7 +15,7 @@ pub struct MainWindow {
 
 impl MainWindow {
     pub fn new(parent: &gtk::Application) -> Self {
-        let glade_src = include_str!("MainWindow.glade");
+        let glade_src = include_str!("main_window.glade");
         let builder = gtk::Builder::new_from_string(glade_src);
 
         let window = Self {
@@ -234,7 +234,7 @@ struct AboutDialog {
 
 impl AboutDialog {
     fn new(parent: &gtk::Window) -> Self {
-        let glade_src = include_str!("AboutDialog.glade");
+        let glade_src = include_str!("about_dialog.glade");
         let builder = gtk::Builder::new_from_string(glade_src);
 
         let dialog: gtk::AboutDialog = builder.get_object("about_dialog").unwrap();
