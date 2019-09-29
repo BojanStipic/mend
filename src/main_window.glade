@@ -62,7 +62,7 @@
         <property name="has_subtitle">False</property>
         <property name="show_close_button">True</property>
         <child>
-          <object class="GtkFileChooserButton" id="open_button">
+          <object class="GtkFileChooserButton" id="open_executable">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="filter">executable_filter</property>
@@ -70,7 +70,7 @@
           </object>
         </child>
         <child>
-          <object class="GtkMenuButton" id="primary_menu">
+          <object class="GtkMenuButton" id="open_primary_menu">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
